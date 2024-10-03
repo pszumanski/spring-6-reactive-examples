@@ -4,6 +4,7 @@ import guru.springframework.spring6reactiveexamples.domain.Person;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -111,6 +112,24 @@ class PersonRepositoryImplTest {
             System.out.println("Error occurred in the mono");
             System.out.println(throwable.toString());
         });
+    }
+
+    @Test
+    void testGetMonoByValidId() {
+        Mono<Person> personWithValidId = personRepository.getById(1);
+
+        StepVerifier.create(personWithValidId).expectNextCount(1).verifyComplete();
+
+        personWithValidId.map(Person::getFirstName).subscribe(System.out::println);
+    }
+
+    @Test
+    void testGetMonoByInvalidId() {
+        Mono<Person> personWithInvalidId = personRepository.getById(-1);
+
+        StepVerifier.create(personWithInvalidId).expectNextCount(0).verifyComplete();
+
+        personWithInvalidId.subscribe(person -> System.out.println("should not get called"));
     }
 }
 
